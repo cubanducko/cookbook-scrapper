@@ -3,11 +3,8 @@
 // Max number of pages at 07/01/2024 is 118 with 27 results per page
 // Some links are weekly menus, with multiple recipes inside (might be duplicates)
 
-import {
-  CheerioCrawlingContext,
-  Dataset,
-  PlaywrightCrawlingContext,
-} from "crawlee";
+import { CheerioCrawlingContext, Dataset } from "crawlee";
+import { databases } from "../../databases/data.ts";
 
 // This only matches search page links
 const recipeSearchRegex =
@@ -15,6 +12,8 @@ const recipeSearchRegex =
 
 // This selector seems semantic enough (as of 07/01/2024), I doubt it will change
 const recipeLinkSelector = "main article header h2 a";
+
+// Dataset
 
 export async function comiScrapper(context: CheerioCrawlingContext) {
   const { request } = context;
@@ -64,7 +63,8 @@ async function scrapeRecipeSearchPage({
 async function scrapeRecipe({ request, $ }: CheerioCrawlingContext) {
   const articleBody = $('[data-dtm-region="articulo_cuerpo"]');
   const articleHTML = articleBody.html();
-  await Dataset.pushData({
+  const dataset = await Dataset.open(databases.elComidista);
+  await dataset.pushData({
     url: request.url,
     body: articleHTML,
   });

@@ -1,5 +1,5 @@
 import { CheerioCrawler } from "crawlee";
-import { comiScrapper } from "./elcomidista-scrapper/comi-scrapper";
+import { comiScrapper } from "./elcomidista/comi-scrapper.ts";
 
 const recipeSiteMap = {
   elComidista: "https://elpais.com/gastronomia/recetas/1",

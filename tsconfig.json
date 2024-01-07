@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
     "esModuleInterop": true,
     "target": "ESNext",
     "noImplicitAny": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
@@ -13,6 +15,9 @@
         "node_modules/*"
       ]
     }
+  },
+  "ts-node": {
+    "esm": true
   },
   "include": [
     "src/**/*.ts"

@@ -176,3 +176,6 @@ dist
 
 # Crawlee internals
 storage
+
+# ChatGPT auth
+auth
