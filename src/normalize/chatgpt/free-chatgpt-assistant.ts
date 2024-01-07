@@ -64,6 +64,7 @@ export class FreeChatGPTAssistant {
       () =>
         document.querySelector<HTMLButtonElement>('[data-testid="send-button"]')
           ?.disabled === true,
+      undefined,
       { timeout: 120000 }
     );
   }

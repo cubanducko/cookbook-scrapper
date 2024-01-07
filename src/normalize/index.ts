@@ -26,12 +26,19 @@ async function parseDatabaseContent(database: string) {
       fs.mkdirSync(dir, { recursive: true });
     }
 
-    const recipes = await recipeFreeNormalizer(api, item.body);
-
-    recipes.forEach((recipe, index) => {
-      const filePath = getUniqueName(item, index);
-      fs.writeFileSync(filePath, JSON.stringify(recipe, null, 2));
-    });
+    try {
+      const recipes = await recipeFreeNormalizer(api, item.body);
+      recipes.forEach((recipe, index) => {
+        const filePath = getNormalizedFilePath(
+          database,
+          getUniqueName(item, index)
+        );
+        fs.writeFileSync(filePath, JSON.stringify(recipe, null, 2));
+      });
+    } catch (e) {
+      console.log(`Error normalizing ${rootRecipeId}`);
+      continue;
+    }
   }
 }
 
