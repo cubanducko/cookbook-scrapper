@@ -3,7 +3,11 @@
 // Max number of pages at 07/01/2024 is 118 with 27 results per page
 // Some links are weekly menus, with multiple recipes inside (might be duplicates)
 
-import { Dataset, PlaywrightCrawlingContext } from "crawlee";
+import {
+  CheerioCrawlingContext,
+  Dataset,
+  PlaywrightCrawlingContext,
+} from "crawlee";
 
 // This only matches search page links
 const recipeSearchRegex =
@@ -12,7 +16,7 @@ const recipeSearchRegex =
 // This selector seems semantic enough (as of 07/01/2024), I doubt it will change
 const recipeLinkSelector = "main article header h2 a";
 
-export async function comiScrapper(context: PlaywrightCrawlingContext) {
+export async function comiScrapper(context: CheerioCrawlingContext) {
   const { request } = context;
   const isSearchPage = recipeSearchRegex.test(request.url);
 
@@ -24,44 +28,42 @@ export async function comiScrapper(context: PlaywrightCrawlingContext) {
 }
 
 async function scrapeRecipeSearchPage({
-  page,
+  $,
   enqueueLinks,
-}: PlaywrightCrawlingContext) {
+}: CheerioCrawlingContext) {
   // Get all links from the page
   // Filter out the ones that are not recipes
   // For each recipe link, enqueue it
   // For each search page link, enqueue it to scrape more recipes
 
-  const recipeLinks = await page.$$eval(recipeLinkSelector, (links) =>
-    links.map((link) => link.getAttribute("href"))
-  );
+  const recipeLinks = $(recipeLinkSelector)
+    .map((i, link) => $(link).attr("href"))
+    .get();
 
   if (recipeLinks.length === 0) {
     return;
   }
 
-  // Enqueue types seem to be broken
   await enqueueLinks({
     urls: recipeLinks,
     label: "DETAIL",
-  } as any);
+  });
 
-  const nextLink = page.getByText("Siguiente");
-  const nextLinkUrl = await nextLink?.getAttribute("href");
+  const nextLink = $('a:contains("Siguiente")');
+  const nextLinkUrl = nextLink.attr("href");
   if (!nextLinkUrl) {
     return;
   }
 
-  // Enqueue types seem to be broken
   await enqueueLinks({
     urls: [nextLinkUrl],
     label: "NAVIGATION",
-  } as any);
+  });
 }
 
-async function scrapeRecipe({ request, page }: PlaywrightCrawlingContext) {
-  const articleBody = await page.$('[data-dtm-region="articulo_cuerpo"]');
-  const articleHTML = await articleBody.innerHTML();
+async function scrapeRecipe({ request, $ }: CheerioCrawlingContext) {
+  const articleBody = $('[data-dtm-region="articulo_cuerpo"]');
+  const articleHTML = articleBody.html();
   await Dataset.pushData({
     url: request.url,
     body: articleHTML,

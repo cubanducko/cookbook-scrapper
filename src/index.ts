@@ -1,25 +1,14 @@
-import { PlaywrightCrawler } from "crawlee";
-import { chromium } from "playwright-extra";
-import stealthPlugin from "puppeteer-extra-plugin-stealth";
+import { CheerioCrawler } from "crawlee";
 import { comiScrapper } from "./elcomidista-scrapper/comi-scrapper";
 
 const recipeSiteMap = {
   elComidista: "https://elpais.com/gastronomia/recetas/1",
 };
 
-chromium.use(stealthPlugin());
-
 async function main() {
-  const crawler = new PlaywrightCrawler({
-    launchContext: {
-      launcher: chromium,
-      launchOptions: {
-        headless: false,
-      },
-    },
-
+  const crawler = new CheerioCrawler({
     // Stop crawling after several pages
-    maxRequestsPerCrawl: 10,
+    // maxRequestsPerCrawl: 10,
 
     async requestHandler(requestContext) {
       const domain = getDomain(requestContext.request.url);
