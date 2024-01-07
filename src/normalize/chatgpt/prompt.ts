@@ -8,7 +8,6 @@ export const normalizerPrompt = `
  This is the desired format written in Typescript:
  export type Response = Recipe[]
  export type Recipe = {
-    id: string;
     language: 'es' | 'en';
     title: string;
     instructions: string[];
@@ -50,7 +49,7 @@ export const normalizerPrompt = `
   10 is something that takes days to prepare and requires a lot of skill.
   1 is something quick that requires little ingredientes and little to no prep work.
   All tags categories, except other, must be filled with something.
-  Keywords is an array that contains the different ingredients (without their quantity) and simplified to a word at most. In their original language.
+  Keywords is an array that contains the different ingredients (without their quantity) and simplified to a word at most. Use the most relevant ones. In their original language.
   Use only the HTML provided in the input, do not include additional information.
   Consider variations in HTML structures and ensure your can handle different page layouts.
   Only reply with the JSON, do not include any other information.
