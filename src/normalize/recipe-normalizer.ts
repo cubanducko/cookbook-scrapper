@@ -1,3 +1,4 @@
+import { Recipe } from "../databases/data.ts";
 import { FreeChatGPTAssistant } from "./chatgpt/free-chatgpt-assistant.ts";
 import { normalizerPrompt } from "./chatgpt/prompt.ts";
 import { load } from "cheerio";
@@ -8,7 +9,7 @@ import { load } from "cheerio";
 export async function recipeFreeNormalizer(
   api: FreeChatGPTAssistant,
   html: string
-) {
+): Promise<Recipe[]> {
   const cleanedHTML = cleanupHTML(html);
   const response = await api.sendMessage(
     normalizerPrompt.replace("{{html}}", cleanedHTML)

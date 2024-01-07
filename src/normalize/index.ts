@@ -1,5 +1,5 @@
 import { Dataset } from "crawlee";
-import { ScrapperRawData, databases } from "../databases/data.ts";
+import { Recipe, ScrapperRawData, databases } from "../databases/data.ts";
 import { recipeFreeNormalizer } from "./recipe-normalizer.ts";
 import { FreeChatGPTAssistant } from "./chatgpt/free-chatgpt-assistant.ts";
 import fs from "fs";
@@ -15,18 +15,23 @@ async function parseDatabaseContent(database: string) {
   const api = new FreeChatGPTAssistant();
 
   for (const item of content) {
-    const recipeId = getUniqueName(item);
-    const filePath = getNormalizedFilePath(database, recipeId);
-    if (fs.existsSync(filePath)) {
+    const rootRecipeId = getUniqueName(item);
+    const rootFilePath = getNormalizedFilePath(database, rootRecipeId);
+    const dir = path.dirname(rootFilePath);
+
+    if (fs.existsSync(rootFilePath)) {
       continue;
     }
-
-    const recipe = await recipeFreeNormalizer(api, item.body);
-    const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(filePath, JSON.stringify(recipe, null, 2));
+
+    const recipes = await recipeFreeNormalizer(api, item.body);
+
+    recipes.forEach((recipe, index) => {
+      const filePath = getUniqueName(item, index);
+      fs.writeFileSync(filePath, JSON.stringify(recipe, null, 2));
+    });
   }
 }
 
@@ -40,13 +45,14 @@ async function getDatabaseContent(database: string) {
   return content.items;
 }
 
-function getUniqueName(data: ScrapperRawData) {
+function getUniqueName(data: ScrapperRawData, index?: number) {
   const url = new URL(data.url);
   const name = url.pathname
     .replaceAll("/", "-")
     .replace("-", "")
     .replace(".html", "");
-  return name;
+
+  return !index ? name : `${name}-${index}`;
 }
 
 main();
